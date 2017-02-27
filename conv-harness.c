@@ -64,7 +64,7 @@ float **** new_empty_4d_matrix(int dim0, int dim1, int dim2, int dim3)
     for ( j = 0; j < dim1; j++ ) {
       result[i][j] = &(mat2[i*dim1*dim2 + j*dim2]);
       for ( k = 0; k < dim2; k++ ) {
-	result[i][j][k] = &(mat3[i*dim1*dim2*dim3+j*dim2*dim3+k*dim3]);
+	       result[i][j][k] = &(mat3[i*dim1*dim2*dim3+j*dim2*dim3+k*dim3]);
       }
     }
   }
@@ -96,9 +96,9 @@ float **** copy_4d_matrix(float **** source_matrix, int dim0,
   for ( i = 0; i < dim0; i++ ) {
     for ( j = 0; j < dim1; j++ ) {
       for ( k = 0; k < dim2; k++ ) {
-	for ( l = 0; l < dim3; l++ ) {
-	  result[i][j][k][l] = source_matrix[i][j][k][l];
-	}
+      	for ( l = 0; l < dim3; l++ ) {
+      	  result[i][j][k][l] = source_matrix[i][j][k][l];
+      	}
       }
     }
   }
@@ -127,15 +127,15 @@ struct timeval seedtime;
   for ( i = 0; i < dim0; i++ ) {
     for ( j = 0; j < dim1; j++ ) {
       for ( k = 0; k < dim2; k++ ) {
-	for ( l = 0; l < dim3; l++ ) {
-	  // generate uniform random integer with mean of zero
-	  long long rand = random();
-	  // now cut down the range and bias the mean to reduce
-	  // the likelihood of large floating point round-off errors
-	  int reduced_range = (rand % range);
-	  float num = (((float) reduced_range) / ((float) bias))+offset;
-	  result[i][j][k][l] = num;
-	}
+      	for ( l = 0; l < dim3; l++ ) {
+      	  // generate uniform random integer with mean of zero
+      	  long long rand = random();
+      	  // now cut down the range and bias the mean to reduce
+      	  // the likelihood of large floating point round-off errors
+      	  int reduced_range = (rand % range);
+      	  float num = (((float) reduced_range) / ((float) bias))+offset;
+      	  result[i][j][k][l] = num;
+      	}
       }
     }
   }
@@ -170,9 +170,9 @@ void check_result(float *** result, float *** control,
   for ( i = 0; i < dim0; i++ ) {
     for ( j = 0; j < dim1; j++ ) {
       for ( k = 0; k < dim2; k++ ) {
-	double diff = fabs(control[i][j][k] - result[i][j][k]);
-	assert( diff >= 0.0 );
-	sum_abs_diff = sum_abs_diff + diff;
+      	double diff = fabs(control[i][j][k] - result[i][j][k]);
+      	assert( diff >= 0.0 );
+      	sum_abs_diff = sum_abs_diff + diff;
       }
     }
   }
@@ -196,15 +196,15 @@ void multichannel_conv(float *** image, float **** kernels, float *** output,
   for ( m = 0; m < nkernels; m++ ) {
     for ( w = 0; w < width; w++ ) {
       for ( h = 0; h < height; h++ ) {
-	float sum = 0.0;
-	for ( c = 0; c < nchannels; c++ ) {
-	  for ( x = 0; x < kernel_order; x++) {
-	    for ( y = 0; y < kernel_order; y++ ) {
-	      sum += image[w+x][h+y][c] * kernels[m][c][x][y];
-	    }
-	  }
-	  output[m][w][h] = sum;
-	}
+      	float sum = 0.0;
+      	for ( c = 0; c < nchannels; c++ ) {
+      	  for ( x = 0; x < kernel_order; x++) {
+      	    for ( y = 0; y < kernel_order; y++ ) {
+      	      sum += image[w+x][h+y][c] * kernels[m][c][x][y];
+      	    }
+      	  }
+      	  output[m][w][h] = sum;
+      	}
       }
     }
   }
@@ -227,7 +227,7 @@ int main(int argc, char ** argv)
   //float kernels[M][C][K][K];
   //float output[M][W][H];
   
-float *** image, **** kernels, *** output;
+  float *** image, **** kernels, *** output;
   float *** control_output;
   long long mul_time;
   int width, height, kernel_order, nchannels, nkernels;
