@@ -1,3 +1,4 @@
+
 /* Test and timing harness program for developing a multichannel
    multikernel convolution (as used in deep learning networks)
 
@@ -10,7 +11,7 @@
 
    Version 1.2 : Changed distribution of test data to (hopefully) 
                  eliminate random walk of floating point error;
-		 Also introduced checks to restrict kernel-order to
+     Also introduced checks to restrict kernel-order to
                  a small set of values
 
    Version 1.1 : Fixed bug in code to create 4d matrix
@@ -40,7 +41,7 @@ void write_out(float *** a, int dim0, int dim1, int dim2)
     printf("Outer dimension number %d\n", i);
     for ( j = 0; j < dim1; i++ ) {
       for ( k = 0; k < dim2 - 1; j++ ) {
-	printf("%f, ", a[i][j][k]);
+  printf("%f, ", a[i][j][k]);
       }
       // print end of line
       printf("%f\n", a[i][j][dim2-1]);
@@ -64,7 +65,7 @@ float **** new_empty_4d_matrix(int dim0, int dim1, int dim2, int dim3)
     for ( j = 0; j < dim1; j++ ) {
       result[i][j] = &(mat2[i*dim1*dim2 + j*dim2]);
       for ( k = 0; k < dim2; k++ ) {
-	       result[i][j][k] = &(mat3[i*dim1*dim2*dim3+j*dim2*dim3+k*dim3]);
+  result[i][j][k] = &(mat3[i*dim1*dim2*dim3+j*dim2*dim3+k*dim3]);
       }
     }
   }
@@ -88,7 +89,7 @@ float *** new_empty_3d_matrix(int dim0, int dim1, int dim2)
 
 /* take a copy of the matrix and return in a newly allocated matrix */
 float **** copy_4d_matrix(float **** source_matrix, int dim0,
-			    int dim1, int dim2, int dim3)
+          int dim1, int dim2, int dim3)
 {
   int i, j, k, l;
   float **** result = new_empty_4d_matrix(dim0, dim1, dim2, dim3);
@@ -96,9 +97,9 @@ float **** copy_4d_matrix(float **** source_matrix, int dim0,
   for ( i = 0; i < dim0; i++ ) {
     for ( j = 0; j < dim1; j++ ) {
       for ( k = 0; k < dim2; k++ ) {
-      	for ( l = 0; l < dim3; l++ ) {
-      	  result[i][j][k][l] = source_matrix[i][j][k][l];
-      	}
+  for ( l = 0; l < dim3; l++ ) {
+    result[i][j][k][l] = source_matrix[i][j][k][l];
+  }
       }
     }
   }
@@ -127,15 +128,15 @@ struct timeval seedtime;
   for ( i = 0; i < dim0; i++ ) {
     for ( j = 0; j < dim1; j++ ) {
       for ( k = 0; k < dim2; k++ ) {
-      	for ( l = 0; l < dim3; l++ ) {
-      	  // generate uniform random integer with mean of zero
-      	  long long rand = random();
-      	  // now cut down the range and bias the mean to reduce
-      	  // the likelihood of large floating point round-off errors
-      	  int reduced_range = (rand % range);
-      	  float num = (((float) reduced_range) / ((float) bias))+offset;
-      	  result[i][j][k][l] = num;
-      	}
+  for ( l = 0; l < dim3; l++ ) {
+    // generate uniform random integer with mean of zero
+    long long rand = random();
+    // now cut down the range and bias the mean to reduce
+    // the likelihood of large floating point round-off errors
+    int reduced_range = (rand % range);
+    float num = (((float) reduced_range) / ((float) bias))+offset;
+    result[i][j][k][l] = num;
+  }
       }
     }
   }
@@ -159,7 +160,7 @@ float *** gen_random_3d_matrix(int dim0, int dim1, int dim2)
 
 /* check the sum of absolute differences is within reasonable epsilon */
 void check_result(float *** result, float *** control,
-		  int dim0, int dim1, int dim2)
+      int dim0, int dim1, int dim2)
 {
   int i, j, k;
   double sum_abs_diff = 0.0;
@@ -170,16 +171,16 @@ void check_result(float *** result, float *** control,
   for ( i = 0; i < dim0; i++ ) {
     for ( j = 0; j < dim1; j++ ) {
       for ( k = 0; k < dim2; k++ ) {
-      	double diff = fabs(control[i][j][k] - result[i][j][k]);
-      	assert( diff >= 0.0 );
-      	sum_abs_diff = sum_abs_diff + diff;
+  double diff = fabs(control[i][j][k] - result[i][j][k]);
+  assert( diff >= 0.0 );
+  sum_abs_diff = sum_abs_diff + diff;
       }
     }
   }
 
   if ( sum_abs_diff > EPSILON ) {
     fprintf(stderr, "WARNING: sum of absolute differences (%f) > EPSILON (%f)\n",
-	    sum_abs_diff, EPSILON);
+      sum_abs_diff, EPSILON);
   }
   else {
     printf("COMMENT: sum of absolute differences (%f)  within acceptable range (%f)\n", sum_abs_diff, EPSILON);
@@ -188,23 +189,23 @@ void check_result(float *** result, float *** control,
 
 /* the slow but correct version of matmul written by David */
 void multichannel_conv(float *** image, float **** kernels, float *** output,
-		       int width, int height, int nchannels, int nkernels,
-		       int kernel_order)
+           int width, int height, int nchannels, int nkernels,
+           int kernel_order)
 {
   int h, w, x, y, c, m;
 
   for ( m = 0; m < nkernels; m++ ) {
     for ( w = 0; w < width; w++ ) {
       for ( h = 0; h < height; h++ ) {
-      	float sum = 0.0;
-      	for ( c = 0; c < nchannels; c++ ) {
-      	  for ( x = 0; x < kernel_order; x++) {
-      	    for ( y = 0; y < kernel_order; y++ ) {
-      	      sum += image[w+x][h+y][c] * kernels[m][c][x][y];
-      	    }
-      	  }
-      	  output[m][w][h] = sum;
-      	}
+  float sum = 0.0;
+  for ( c = 0; c < nchannels; c++ ) {
+    for ( x = 0; x < kernel_order; x++) {
+      for ( y = 0; y < kernel_order; y++ ) {
+        sum += image[w+x][h+y][c] * kernels[m][c][x][y];
+      }
+    }
+    output[m][w][h] = sum;
+  }
       }
     }
   }
@@ -212,13 +213,13 @@ void multichannel_conv(float *** image, float **** kernels, float *** output,
 
 /* the fast version of matmul written by the team */
 void team_conv(float *** image, float **** kernels, float *** output,
-	       int width, int height, int nchannels, int nkernels,
-	       int kernel_order)
+         int width, int height, int nchannels, int nkernels,
+         int kernel_order)
 {
   // this call here is just dummy code
   // insert your own code instead
   multichannel_conv(image, kernels, output, width,
-		    height, nchannels, nkernels, kernel_order);
+        height, nchannels, nkernels, kernel_order);
 }
 
 int main(int argc, char ** argv)
@@ -227,7 +228,7 @@ int main(int argc, char ** argv)
   //float kernels[M][C][K][K];
   //float output[M][W][H];
   
-  float *** image, **** kernels, *** output;
+float *** image, **** kernels, *** output;
   float *** control_output;
   long long mul_time;
   int width, height, kernel_order, nchannels, nkernels;
@@ -252,13 +253,13 @@ int main(int argc, char ** argv)
   case 7: break;
   default:
     fprintf(stderr, "FATAL: kernel_order must be 1, 3, 5 or 7, not %d\n",
-	    kernel_order);
+      kernel_order);
     exit(1);
   }
 
   /* allocate the matrices */
   image = gen_random_3d_matrix(width+kernel_order, height + kernel_order,
-			       nchannels);
+             nchannels);
   kernels = gen_random_4d_matrix(nkernels, nchannels, kernel_order, kernel_order);
   output = new_empty_3d_matrix(width, height, nkernels);
   control_output = new_empty_3d_matrix(width, height, nkernels);
@@ -267,14 +268,14 @@ int main(int argc, char ** argv)
 
   /* use a simple multichannel convolution routine to produce control result */
   multichannel_conv(image, kernels, control_output, width,
-		    height, nchannels, nkernels, kernel_order);
+        height, nchannels, nkernels, kernel_order);
 
   /* record starting time of team's code*/
   gettimeofday(&start_time, NULL);
 
   /* perform student team's multichannel convolution */
   team_conv(image, kernels, output, width,
-		    height, nchannels, nkernels, kernel_order);
+        height, nchannels, nkernels, kernel_order);
 
   /* record finishing time */
   gettimeofday(&stop_time, NULL);
