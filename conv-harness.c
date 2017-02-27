@@ -16,7 +16,7 @@
 
    Version 1.1 : Fixed bug in code to create 4d matrix
 */
-
+#include <x86intrin.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
