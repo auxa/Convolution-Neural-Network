@@ -65,7 +65,7 @@ float **** new_empty_4d_matrix(int dim0, int dim1, int dim2, int dim3)
     for ( j = 0; j < dim1; j++ ) {
       result[i][j] = &(mat2[i*dim1*dim2 + j*dim2]);
       for ( k = 0; k < dim2; k++ ) {
-  result[i][j][k] = &(mat3[i*dim1*dim2*dim3+j*dim2*dim3+k*dim3]);
+        result[i][j][k] = &(mat3[i*dim1*dim2*dim3+j*dim2*dim3+k*dim3]);
       }
     }
   }
@@ -128,15 +128,15 @@ struct timeval seedtime;
   for ( i = 0; i < dim0; i++ ) {
     for ( j = 0; j < dim1; j++ ) {
       for ( k = 0; k < dim2; k++ ) {
-  for ( l = 0; l < dim3; l++ ) {
-    // generate uniform random integer with mean of zero
-    long long rand = random();
-    // now cut down the range and bias the mean to reduce
-    // the likelihood of large floating point round-off errors
-    int reduced_range = (rand % range);
-    float num = (((float) reduced_range) / ((float) bias))+offset;
-    result[i][j][k][l] = num;
-  }
+        for ( l = 0; l < dim3; l++ ) {
+          // generate uniform random integer with mean of zero
+          long long rand = random();
+          // now cut down the range and bias the mean to reduce
+          // the likelihood of large floating point round-off errors
+          int reduced_range = (rand % range);
+          float num = (((float) reduced_range) / ((float) bias))+offset;
+          result[i][j][k][l] = num;
+        }
       }
     }
   }
@@ -166,14 +166,14 @@ void check_result(float *** result, float *** control,
   double sum_abs_diff = 0.0;
   const double EPSILON = 0.0625;
 
-  //printf("SAD\n");
+  //printf("SAD\n"); 
   
   for ( i = 0; i < dim0; i++ ) {
     for ( j = 0; j < dim1; j++ ) {
       for ( k = 0; k < dim2; k++ ) {
-  double diff = fabs(control[i][j][k] - result[i][j][k]);
-  assert( diff >= 0.0 );
-  sum_abs_diff = sum_abs_diff + diff;
+        double diff = fabs(control[i][j][k] - result[i][j][k]);
+        assert( diff >= 0.0 );
+        sum_abs_diff = sum_abs_diff + diff;
       }
     }
   }
@@ -197,15 +197,15 @@ void multichannel_conv(float *** image, float **** kernels, float *** output,
   for ( m = 0; m < nkernels; m++ ) {
     for ( w = 0; w < width; w++ ) {
       for ( h = 0; h < height; h++ ) {
-  float sum = 0.0;
-  for ( c = 0; c < nchannels; c++ ) {
-    for ( x = 0; x < kernel_order; x++) {
-      for ( y = 0; y < kernel_order; y++ ) {
-        sum += image[w+x][h+y][c] * kernels[m][c][x][y];
-      }
-    }
-    output[m][w][h] = sum;
-  }
+        float sum = 0.0;
+        for ( c = 0; c < nchannels; c++ ) {
+          for ( x = 0; x < kernel_order; x++) {
+            for ( y = 0; y < kernel_order; y++ ) {
+              sum += image[w+x][h+y][c] * kernels[m][c][x][y];
+            }
+          }
+          output[m][w][h] = sum;
+        }
       }
     }
   }
