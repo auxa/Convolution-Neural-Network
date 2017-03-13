@@ -216,38 +216,62 @@ void team_conv(float *** image, float **** kernels, float *** output,
          int width, int height, int nchannels, int nkernels,
          int kernel_order)
 {
-  
+   /*
+ 
+  int h, w, x, y, c, m;
 
-    int h, w, x, y, c, m;
-   
-        __m128 r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11;
+  for ( m = 0; m < nkernels; m++ ) {
+    for ( w = 0; w < width; w++ ) {
+      for ( h = 0; h < height; h++ ) {
+        float sum = 0.0;
+        for ( c = 0; c < nchannels; c++ ) {
+          for ( x = 0; x < kernel_order; x++) {
+            for ( y = 0; y < kernel_order; y++ ) {
+              sum += image[w+x][h+y][c] * kernels[m][c][x][y];
+            }
+          }
+          output[m][w][h] = sum;
+        }
+      }
+    }
+  }
+    */
+  int h, w, x, y, c, m;
+    float answers[] = {0.0, 0.0, 0.0, 0.0};
+        __m128 r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, sum1;
       float x1, x2, x3, x4, y1, y2, y3, y4;
+      int var, var1;
       for ( m = 0; m < nkernels; m++ ) {
         for ( w = 0; w < width; w++ ) {
           for ( h = 0; h < height; h++ ) {
-            float sum = 0.0;
+            __m128 sum = _mm_setzero_ps();
             for ( c = 0; c < nchannels; c++ ) {
               for ( x = 0; x < kernel_order; x++) {
-                for ( y = 0; y < kernel_order; y++ ) {
-                  x1 = w+x;
-                  y1 = h+y;
-                  r1 = _mm_load1_ps(&image[x1][y1][c]);
-                  r2 = _mm_load1_ps(&image[x1][y1+1][c]);
-                  r3 = _mm_load1_ps(&image[x1][y1+2][c]);
-                  r4 = _mm_load1_ps(&image[x1][y2+3][c]);
-
-
+                for ( y = 0; y < kernel_order-4; y+=4 ) {
+                  var = w+x;
+                  var1 = h+y;
+                  r1 = _mm_set_ps(image[var][var1][c], image[var][var1+1][c], image[var][var1+2][c], image[var][var1+3][c]);
+                  
                   r2 = _mm_load_ps(&kernels[m][c][x][y]);
 
-                  sum += image[w+x][h+y][c] * kernels[m][c][x][y];
+                  r3 = _mm_mul_ps(r1, r2);
+
+                  sum = _mm_add_ps(sum, r3);
+
+                 // sum += image[w+x][h+y][c] * kernels[m][c][x][y];
                 }
               }
-              output[m][w][h] = sum;
+              _mm_store_ps(&answers, sum);
+
+              float total;
+
+              total = answers[0] + answers[1]  + answers[2] + answers[3];
+
+              output[m][w][h] = total;
             }
           }
         }
     }
-  
 }
 
 int main(int argc, char ** argv)
