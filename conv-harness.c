@@ -229,26 +229,21 @@ void team_conv(float *** image, float **** kernels, float *** output,
                int width, int height, int nchannels, int nkernels,
                int kernel_order)
 {
-  // this call here is just dummy code
-  // insert your own code instead
-
-  
-  int h, w, x, y, c, m;
-    float answers[] = {0.0, 0.0, 0.0, 0.0};
-        __m128 r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, sum1;
-      float x1, x2, x3, x4, y1, y2, y3, y4;
-      int var, var1;
+      int h, w, x, y, c, m, var, var1;
+      __m128 r1, r2, r3,sum,hold;
+     float answers[] = {0.0, 0.0, 0.0, 0.0};
       for ( m = 0; m < nkernels; m++ ) {
+        
         for ( w = 0; w < width; w++ ) {
+          #pragma omp for
           for ( h = 0; h < height; h++ ) {
-            __m128 sum = _mm_setzero_ps();
+            sum = _mm_setzero_ps();
             for ( c = 0; c < nchannels; c++ ) {
               for ( x = 0; x < kernel_order; x++) {
                 for ( y = 0; y < kernel_order; y+=4) {
-                  int check = kernel_order - y;
                    var = w+x;
                    var1 = h+y;
-                  switch (check){
+                  switch (kernel_order - y){
                     case 1:
                      r1 = _mm_set_ps(image[var][var1][c], 0,0, 0);
 
@@ -290,19 +285,19 @@ void team_conv(float *** image, float **** kernels, float *** output,
                  // sum += image[w+x][h+y][c] * kernels[m][c][x][y];
                 }
               }
-              _mm_store_ps(&answers, sum);
+              hold = _mm_hadd_ps(sum, sum);
+              hold = _mm_hadd_ps(hold, sum);
+              _mm_store_ps(&answers, hold);
 
-              float total;
-
-              total = answers[0] + answers[1]  + answers[2] + answers[3];
-
-              output[m][w][h] = total;
+              output[m][w][h] = answers[0];
             }
           }
         }
-    }
+    }      
+  }
+
     
-}
+
 
 int main(int argc, char ** argv)
 {
