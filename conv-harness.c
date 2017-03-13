@@ -232,10 +232,10 @@ void team_conv(float *** image, float **** kernels, float *** output,
       int h, w, x, y, c, m, var, var1;
       __m128 r1, r2, r3,sum,hold;
      float answers[] = {0.0, 0.0, 0.0, 0.0};
+      #pragma omp for
       for ( m = 0; m < nkernels; m++ ) {
-        
+       
         for ( w = 0; w < width; w++ ) {
-          #pragma omp for
           for ( h = 0; h < height; h++ ) {
             sum = _mm_setzero_ps();
             for ( c = 0; c < nchannels; c++ ) {
