@@ -231,11 +231,15 @@ void team_conv(float *** image, float **** kernels, float *** output,
             for ( c = 0; c < nchannels; c++ ) {
               for ( x = 0; x < kernel_order; x++) {
                 for ( y = 0; y < kernel_order; y++ ) {
-               //   x1 = w+x;
-               //   y1 = h+y;
+                  x1 = w+x;
+                  y1 = h+y;
+                  r1 = _mm_load1_ps(&image[x1][y1][c]);
+                  r2 = _mm_load1_ps(&image[x1][y1+1][c]);
+                  r3 = _mm_load1_ps(&image[x1][y1+2][c]);
+                  r4 = _mm_load1_ps(&image[x1][y2+3][c]);
+                  
 
-                //  r1 = _mm_load_ps(&image[x1][y1][c]);
-                //  r2 = _mm_load_ps(&kernels[m][c][x][y]);
+                  r2 = _mm_load_ps(&kernels[m][c][x][y]);
 
                   sum += image[w+x][h+y][c] * kernels[m][c][x][y];
                 }
