@@ -27,7 +27,7 @@
 /* the following two definitions of DEBUGGING control whether or not
    debugging information is written out. To put the program into
    debugging mode, uncomment the following line: */
-/*#define DEBUGGING(_x) _x */
+#define DEBUGGING(_x) _x 
 /* to stop the printing of debugging information, use the following line: */
 #define DEBUGGING(_x)
 
@@ -247,17 +247,58 @@ void team_conv(float *** image, float **** kernels, float *** output,
             __m128 sum = _mm_setzero_ps();
             for ( c = 0; c < nchannels; c++ ) {
               for ( x = 0; x < kernel_order; x++) {
-                for ( y = 0; y < kernel_order-4; y+=4 ) {
-                  var = w+x;
-                  var1 = h+y;
-                  r1 = _mm_set_ps(image[var][var1][c], image[var][var1+1][c], image[var][var1+2][c], image[var][var1+3][c]);
+                for ( y = 0; y < kernel_order; y+=4 ) {
+                  int check = kernel_order - y;
+                   var = w+x;
+                   var1 = h+y;
+                  switch (check){
+                    case 0:
+                      r1 = _mm_set_ps(image[var][var1][c], image[var][var1+1][c], image[var][var1+2][c], image[var][var1+3][c]);
+                      
+                      r2 = _mm_load_ps(&kernels[m][c][x][y]);
+
+                      r3 = _mm_mul_ps(r1, r2);
+
+                      sum = _mm_add_ps(sum, r3);
+                      break;
+                    case 1:
+                     r1 = _mm_set_ps(image[var][var1][c], 0,0, 0);
+
+                      r2 = _mm_load_ps(&kernels[m][c][x][y]);
+
+                      r3 = _mm_mul_ps(r1, r2);
+
+                      sum = _mm_add_ps(sum, r3);
+                      break;
+                    case 2:
+                      r1 = _mm_set_ps(image[var][var1][c], image[var][var1+1][c], 0, 0);
+                      
+                      r2 = _mm_load_ps(&kernels[m][c][x][y]);
+
+                      r3 = _mm_mul_ps(r1, r2);
+
+                      sum = _mm_add_ps(sum, r3);
+                      break;
+                    case 3:
+                      r1 = _mm_set_ps(image[var][var1][c], image[var][var1+1][c], image[var][var1+2][c], 0);
+
+                      r2 = _mm_load_ps(&kernels[m][c][x][y]);
+
+                      r3 = _mm_mul_ps(r1, r2);
+
+                      sum = _mm_add_ps(sum, r3);
+                      break;
+                    default:
+                      r1 = _mm_set_ps(image[var][var1][c], image[var][var1+1][c], image[var][var1+2][c], image[var][var1+3][c]);
+                      
+                      r2 = _mm_load_ps(&kernels[m][c][x][y]);
+
+                      r3 = _mm_mul_ps(r1, r2);
+
+                      sum = _mm_add_ps(sum, r3);
+                      break;
+                  }
                   
-                  r2 = _mm_load_ps(&kernels[m][c][x][y]);
-
-                  r3 = _mm_mul_ps(r1, r2);
-
-                  sum = _mm_add_ps(sum, r3);
-
                  // sum += image[w+x][h+y][c] * kernels[m][c][x][y];
                 }
               }
