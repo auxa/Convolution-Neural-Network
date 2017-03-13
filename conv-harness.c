@@ -216,10 +216,23 @@ void team_conv(float *** image, float **** kernels, float *** output,
          int width, int height, int nchannels, int nkernels,
          int kernel_order)
 {
-  // this call here is just dummy code
-  // insert your own code instead
-  multichannel_conv(image, kernels, output, width,
-        height, nchannels, nkernels, kernel_order);
+  int h, w, x, y, c, m;
+
+  for ( m = 0; m < nkernels; m++ ) {
+    for ( w = 0; w < width; w++ ) {
+      for ( h = 0; h < height; h++ ) {
+        float sum = 0.0;
+        for ( c = 0; c < nchannels; c++ ) {
+          for ( x = 0; x < kernel_order; x++) {
+            for ( y = 0; y < kernel_order; y++ ) {
+              sum += image[w+x][h+y][c] * kernels[m][c][x][y];
+            }
+          }
+          output[m][w][h] = sum;
+        }
+      }
+    }
+  }
 }
 
 int main(int argc, char ** argv)

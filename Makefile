@@ -1,5 +1,7 @@
 CC=gcc
-CFLAGS=-I
+CFLAGS=-O3 -msse4
 
-convmake: conv-harness.c
-	$(CC) -O3 -msse4 conv-harness.c
+convmake: conv-harness.o
+	$(CC) $(CFLAGS) conv-harness.o
+
+
