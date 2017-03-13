@@ -216,21 +216,34 @@ void team_conv(float *** image, float **** kernels, float *** output,
          int width, int height, int nchannels, int nkernels,
          int kernel_order)
 {
-  int h, w, x, y, c, m;
+  
 
-  for ( m = 0; m < nkernels; m++ ) {
-    for ( w = 0; w < width; w++ ) {
-      for ( h = 0; h < height; h++ ) {
-        float sum = 0.0;
-        for ( c = 0; c < nchannels; c++ ) {
-          for ( x = 0; x < kernel_order; x++) {
-            for ( y = 0; y < kernel_order; y++ ) {
-              sum += image[w+x][h+y][c] * kernels[m][c][x][y];
+    int h, w, x, y, c, m;
+    #pragma omp parallel
+    {
+        __m128 r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11;
+      float x1, x2, x3, x4, y1, y2, y3, y4;
+      #pragma omp for 
+      for ( m = 0; m < nkernels; m++ ) {
+        for ( w = 0; w < width; w++ ) {
+          for ( h = 0; h < height; h++ ) {
+            float sum = 0.0;
+            for ( c = 0; c < nchannels; c++ ) {
+              for ( x = 0; x < kernel_order; x++) {
+                for ( y = 0; y < kernel_order; y++ ) {
+               //   x1 = w+x;
+               //   y1 = h+y;
+
+                //  r1 = _mm_load_ps(&image[x1][y1][c]);
+                //  r2 = _mm_load_ps(&kernels[m][c][x][y]);
+
+                  sum += image[w+x][h+y][c] * kernels[m][c][x][y];
+                }
+              }
+              output[m][w][h] = sum;
             }
           }
-          output[m][w][h] = sum;
         }
-      }
     }
   }
 }
