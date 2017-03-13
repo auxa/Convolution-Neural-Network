@@ -219,11 +219,9 @@ void team_conv(float *** image, float **** kernels, float *** output,
   
 
     int h, w, x, y, c, m;
-    #pragma omp parallel
-    {
+   
         __m128 r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11;
       float x1, x2, x3, x4, y1, y2, y3, y4;
-      #pragma omp for 
       for ( m = 0; m < nkernels; m++ ) {
         for ( w = 0; w < width; w++ ) {
           for ( h = 0; h < height; h++ ) {
@@ -237,7 +235,7 @@ void team_conv(float *** image, float **** kernels, float *** output,
                   r2 = _mm_load1_ps(&image[x1][y1+1][c]);
                   r3 = _mm_load1_ps(&image[x1][y1+2][c]);
                   r4 = _mm_load1_ps(&image[x1][y2+3][c]);
-                  
+
 
                   r2 = _mm_load_ps(&kernels[m][c][x][y]);
 
@@ -249,7 +247,7 @@ void team_conv(float *** image, float **** kernels, float *** output,
           }
         }
     }
-  }
+  
 }
 
 int main(int argc, char ** argv)
