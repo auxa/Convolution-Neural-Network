@@ -234,7 +234,6 @@ void team_conv(float *** image, float **** kernels, float *** output,
      float answers[] = {0.0, 0.0, 0.0, 0.0};
       #pragma omp for
       for ( m = 0; m < nkernels; m++ ) {
-       
         for ( w = 0; w < width; w++ ) {
           for ( h = 0; h < height; h++ ) {
             sum = _mm_setzero_ps();
