@@ -229,9 +229,9 @@ void team_conv(float *** image, float **** kernels, float *** output,
                int width, int height, int nchannels, int nkernels,
                int kernel_order)
 {
-      int h, w, x, y, c, m, var, var1;
-      __m128 r1, r2, r3,sum,hold;
-     float answers[] = {0.0, 0.0, 0.0, 0.0};
+      int h, w, x, y=0, c, m, var, var1;
+      float answers = {0.0, 0.0, 0.0, 0.0};
+      __m128 r1, r2, r3, r4, r5,sum,hold;
       #pragma omp for
       for ( m = 0; m < nkernels; m++ ) {
         for ( w = 0; w < width; w++ ) {
@@ -239,23 +239,13 @@ void team_conv(float *** image, float **** kernels, float *** output,
             sum = _mm_setzero_ps();
             for ( c = 0; c < nchannels; c++ ) {
               for ( x = 0; x < kernel_order; x++) {
-                for ( y = 0; y < kernel_order; y+=4) {
                    var = w+x;
                    var1 = h+y;
-                  switch (kernel_order - y){
+                  switch (kernel_order){
                     case 1:
-                     r1 = _mm_set_ps(image[var][var1][c], 0,0, 0);
+                     r1 = _mm_set_ss(image[var][var1][c]);
 
-                      r2 = _mm_set1_ps(kernels[m][c][x][y]);
-
-                      r3 = _mm_mul_ps(r1, r2);
-
-                      sum = _mm_add_ps(sum, r3);
-                      break;
-                    case 2:
-                      r1 = _mm_set_ps(image[var][var1][c], image[var][var1+1][c], 0.0, 0.0);
-                      
-                      r2 = _mm_set_ps(kernels[m][c][x][y], kernels[m][c][x][y+1],0.0,0.0);
+                      r2 = _mm_set_ss(kernels[m][c][x][y]);
 
                       r3 = _mm_mul_ps(r1, r2);
 
@@ -270,7 +260,7 @@ void team_conv(float *** image, float **** kernels, float *** output,
 
                       sum = _mm_add_ps(sum, r3);
                       break;
-                    default:
+                    case 5:
                       r1 = _mm_set_ps(image[var][var1][c], image[var][var1+1][c], image[var][var1+2][c], image[var][var1+3][c]);
                       
                       r2 = _mm_load_ps(&kernels[m][c][x][y]);
@@ -278,22 +268,41 @@ void team_conv(float *** image, float **** kernels, float *** output,
                       r3 = _mm_mul_ps(r1, r2);
 
                       sum = _mm_add_ps(sum, r3);
-                      break;
+
+                      r1 = _mm_set_ss(image[var][var1+4][c]);
+
+                      r2 = _mm_set_ss(kernels[m][c][x][y+4]);
+
+                      r3 = _mm_mul_ps(r1, r2);
+
+                      sum = _mm_add_ps(sum, r3);
+
+                    case 7:
+                      r1 = _mm_set_ps(image[var][var1][c], image[var][var1+1][c], image[var][var1+2][c], image[var][var1+3][c]);
+                      
+                      r2 = _mm_load_ps(&kernels[m][c][x][y]);
+
+                      r3 = _mm_mul_ps(r1, r2);
+
+                      sum = _mm_add_ps(sum, r3);
+
+                      r1 = _mm_set_ps(image[var][var1+4][c], image[var][var1+5][c], image[var][var1+6][c], 0);
+
+                      r2 = _mm_set_ps(kernels[m][c][x][y+4], kernels[m][c][x][y+5],kernels[m][c][x][y+6], 0.0);
+
+                      r3 = _mm_mul_ps(r1, r2);
+
+                      sum = _mm_add_ps(sum, r3);
                   }
-                  
-                 // sum += image[w+x][h+y][c] * kernels[m][c][x][y];
                 }
               }
-              hold = _mm_hadd_ps(sum, sum);
-              hold = _mm_hadd_ps(hold, sum);
-              _mm_store_ps(&answers, hold);
-
+              _mm_store_ss(&answers , (_mm_hadd_ps(hold, _mm_hadd_ps(sum, sum))));
               output[m][w][h] = answers[0];
+
             }
           }
         }
     }      
-  }
 
     
 
