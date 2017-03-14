@@ -239,7 +239,7 @@ void team_conv(float *** image, float **** kernels, float *** output,
             sum = _mm_setzero_ps();
             for ( c = 0; c < nchannels; c++ ) {
               for ( x = 0; x < kernel_order; x++) {
-                   var = w+x;
+                  var = w+x;
                   switch (kernel_order){
                     case 1:
                      r1 = _mm_set_ss(image[var][h][c]);
@@ -301,9 +301,10 @@ void team_conv(float *** image, float **** kernels, float *** output,
             }
           }
         }
-    }      
+    }
 
-    
+
+
 
 
 int main(int argc, char ** argv)
