@@ -252,10 +252,14 @@ void team_conv(float *** image, float **** kernels, float *** output,
 
                       break;
                     case 5:
+                    for(x=0;x< kernel_order;x++){
+                      var=w+x;
                       sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps(_mm_set_ps(image[var][h][c], 
                               image[var][h+1][c], image[var][h+2][c], image[var][h+3][c]),
                                  _mm_load_ps(&kernels[m][c][x][0])), _mm_mul_ps(_mm_set_ss(image[var][h+4][c]),
                                   _mm_set_ss(kernels[m][c][x][4]))));
+                      
+                    }
                       break;
                     case 7:
                       sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps((_mm_set_ps(image[var][h][c], image[var][h+1][c], image[var][h+2][c], 
