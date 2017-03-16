@@ -229,11 +229,10 @@ void team_conv(float *** image, float **** kernels, float *** output,
                int width, int height, int nchannels, int nkernels,
                int kernel_order)
 {
-      float answers[] = {0.0, 0.0, 0.0, 0.0};
       int h, w, x, c, m, var;
-      __m128 sum = _mm_setzero_ps();
+      __m128 sum;
 
-     #pragma omp parallel for private (h, w, x, c, m, var, answers, sum)
+     #pragma omp parallel for private (h, w, x, c, m, sum)
       for ( m = 0; m < nkernels; m++ ) {
         for ( w = 0; w < width; w++ ) {
           for ( h = 0; h < height; h++ ) {
@@ -252,7 +251,6 @@ void team_conv(float *** image, float **** kernels, float *** output,
 
                       break;
                     case 5:
-                      
                       sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps(_mm_set_ps(image[w][h][c], 
                               image[w][h+1][c], image[w][h+2][c], image[w][h+3][c]),
                                  _mm_set_ps(kernels[m][c][0][0],kernels[m][c][0][1],kernels[m][c][0][2],kernels[m][c][0][3])),
@@ -292,9 +290,7 @@ void team_conv(float *** image, float **** kernels, float *** output,
                     }
                   }
               }
-              _mm_store_ss(&answers , (_mm_hadd_ps(_mm_hadd_ps(sum, sum), sum)));
-              output[m][w][h] = answers[0];
-
+              output[m][w][h] = _mm_cvtss_f32((_mm_hadd_ps(_mm_hadd_ps(sum, sum), sum)));
               sum = _mm_setzero_ps();
 
             }
