@@ -252,15 +252,34 @@ void team_conv(float *** image, float **** kernels, float *** output,
 
                       break;
                     case 5:
-                    for(x=0;x< kernel_order;x++){
-                        var=w+x;
-                      sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps(_mm_set_ps(image[var][h][c], 
-                              image[var][h+1][c], image[var][h+2][c], image[var][h+3][c]),
-                                 _mm_set_ps(kernels[m][c][x][0],kernels[m][c][x][1],kernels[m][c][x][2],kernels[m][c][x][3])),
-                                  _mm_mul_ps(_mm_set_ss(image[var][h+4][c]),
-                                  _mm_set_ss(kernels[m][c][x][4]))));
                       
-                    }
+                      sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps(_mm_set_ps(image[w][h][c], 
+                              image[w][h+1][c], image[w][h+2][c], image[w][h+3][c]),
+                                 _mm_set_ps(kernels[m][c][0][0],kernels[m][c][0][1],kernels[m][c][0][2],kernels[m][c][0][3])),
+                                  _mm_mul_ps(_mm_set_ss(image[w][h+4][c]),
+                                  _mm_set_ss(kernels[m][c][0][4]))));
+                      sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps(_mm_set_ps(image[w+1][h][c], 
+                              image[w+1][h+1][c], image[w+1][h+2][c], image[w+1][h+3][c]),
+                                 _mm_set_ps(kernels[m][c][1][0],kernels[m][c][1][1],kernels[m][c][1][2],kernels[m][c][1][3])),
+                                  _mm_mul_ps(_mm_set_ss(image[w+1][h+4][c]),
+                                  _mm_set_ss(kernels[m][c][1][4]))));
+                      sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps(_mm_set_ps(image[w+2][h][c], 
+                              image[w+2][h+1][c], image[w+2][h+2][c], image[w+2][h+3][c]),
+                                 _mm_set_ps(kernels[m][c][2][0],kernels[m][c][2][1],kernels[m][c][2][2],kernels[m][c][2][3])),
+                                  _mm_mul_ps(_mm_set_ss(image[w+2][h+4][c]),
+                                  _mm_set_ss(kernels[m][c][2][4]))));
+                      sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps(_mm_set_ps(image[w+3][h][c], 
+                              image[w+3][h+1][c], image[w+3][h+2][c], image[w+3][h+3][c]),
+                                 _mm_set_ps(kernels[m][c][3][0],kernels[m][c][3][1],kernels[m][c][3][2],kernels[m][c][3][3])),
+                                  _mm_mul_ps(_mm_set_ss(image[w+3][h+4][c]),
+                                  _mm_set_ss(kernels[m][c][3][4]))));
+                      sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps(_mm_set_ps(image[w+4][h][c], 
+                              image[w+4][h+1][c], image[w+4][h+2][c], image[w+4][h+3][c]),
+                                 _mm_set_ps(kernels[m][c][4][0],kernels[m][c][4][1],kernels[m][c][4][2],kernels[m][c][4][3])),
+                                  _mm_mul_ps(_mm_set_ss(image[w+4][h+4][c]),
+                                  _mm_set_ss(kernels[m][c][4][4]))));
+                      
+                    
                       break;
                     case 7:
 
