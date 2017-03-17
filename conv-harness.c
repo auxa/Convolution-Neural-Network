@@ -232,25 +232,35 @@ void team_conv(float *** image, float **** kernels, float *** output,
       int h, w, x, c, m, var;
       __m128 sum;
 
-     #pragma omp parallel for private (h, w, x, c, m, sum)
+      #pragma omp parallel for private (h, w, x, c, m, sum)
       for ( m = 0; m < nkernels; m++ ) {
         for ( w = 0; w < width; w++ ) {
           for ( h = 0; h < height; h++ ) {
-            for ( c = 0; c < nchannels; c++ ) {
+                  
+
                   switch (kernel_order){
                     case 1:
+                    for ( c = 0; c < nchannels; c++ ) {
                       sum = _mm_add_ps(sum, _mm_mul_ps(_mm_set_ss(image[w][h][c]), _mm_set_ss(kernels[m][c][0][0])));
+
+                    }
+                      output[m][w][h] = _mm_cvtss_f32((_mm_hadd_ps(_mm_hadd_ps(sum, sum), sum)));
+
                       break;
                     case 3:
+                     for ( c = 0; c < nchannels; c++ ) {
                       sum = _mm_add_ps(sum,_mm_mul_ps(_mm_set_ps(image[w][h][c], image[w][h+1][c],
                        image[w][h+2][c], 0), _mm_set_ps(kernels[m][c][0][0], kernels[m][c][0][1],kernels[m][c][0][2],0.0)));
                       sum = _mm_add_ps(sum,_mm_mul_ps(_mm_set_ps(image[w+1][h][c], image[w+1][h+1][c],
                        image[w+1][h+2][c], 0), _mm_set_ps(kernels[m][c][1][0], kernels[m][c][1][1],kernels[m][c][1][2],0.0)));
                       sum = _mm_add_ps(sum,_mm_mul_ps(_mm_set_ps(image[w+2][h][c], image[w+2][h+1][c],
                        image[w+2][h+2][c], 0), _mm_set_ps(kernels[m][c][2][0], kernels[m][c][2][1],kernels[m][c][2][2],0.0)));
-
+                     
+                    }
+                    output[m][w][h] = _mm_cvtss_f32((_mm_hadd_ps(_mm_hadd_ps(sum, sum), sum)));
                       break;
                     case 5:
+                    for ( c = 0; c < nchannels; c++ ) {
                       sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps(_mm_set_ps(image[w][h][c], 
                               image[w][h+1][c], image[w][h+2][c], image[w][h+3][c]),
                                  _mm_set_ps(kernels[m][c][0][0],kernels[m][c][0][1],kernels[m][c][0][2],kernels[m][c][0][3])),
@@ -276,11 +286,14 @@ void team_conv(float *** image, float **** kernels, float *** output,
                                  _mm_set_ps(kernels[m][c][4][0],kernels[m][c][4][1],kernels[m][c][4][2],kernels[m][c][4][3])),
                                   _mm_mul_ps(_mm_set_ss(image[w+4][h+4][c]),
                                   _mm_set_ss(kernels[m][c][4][4]))));
-                      
+
+                      }
+                     output[m][w][h] = _mm_cvtss_f32((_mm_hadd_ps(_mm_hadd_ps(sum, sum), sum)));
+
                     
                       break;
                     case 7:
-
+              for ( c = 0; c < nchannels; c++ ) {
                     for(x=0;x< kernel_order;x++){
                       var=w+x;
                       sum = _mm_add_ps(sum, _mm_add_ps(_mm_mul_ps((_mm_set_ps(image[var][h][c], image[var][h+1][c], image[var][h+2][c], 
@@ -288,11 +301,13 @@ void team_conv(float *** image, float **** kernels, float *** output,
                                _mm_mul_ps(_mm_set_ps(image[var][h+4][c], image[var][h+5][c], image[var][h+6][c], 0),
                                 _mm_set_ps(kernels[m][c][x][4], kernels[m][c][x][5],kernels[m][c][x][6], 0.0))));
                     }
+                   
                   }
-              }
-              output[m][w][h] = _mm_cvtss_f32((_mm_hadd_ps(_mm_hadd_ps(sum, sum), sum)));
-              sum = _mm_setzero_ps();
+                  output[m][w][h] = _mm_cvtss_f32((_mm_hadd_ps(_mm_hadd_ps(sum, sum), sum)));
 
+                }
+                 sum = _mm_setzero_ps();
+              
             }
           }
    }
