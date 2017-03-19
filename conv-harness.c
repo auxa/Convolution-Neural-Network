@@ -245,6 +245,7 @@ void team_conv(float *** image, float **** kernels, float *** output,
 
                     }
                       output[m][w][h] = _mm_cvtss_f32((_mm_hadd_ps(_mm_hadd_ps(sum, sum), sum)));
+
                       break;
                     case 3:
                      for ( c = 0; c < nchannels; c++ ) {
@@ -287,7 +288,6 @@ void team_conv(float *** image, float **** kernels, float *** output,
                                   _mm_set_ss(kernels[m][c][4][4]))));
 
                       }
-                      
                      output[m][w][h] = _mm_cvtss_f32((_mm_hadd_ps(_mm_hadd_ps(sum, sum), sum)));
 
                     
